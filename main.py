@@ -16,7 +16,7 @@ device=torch.device(dev)
 # YOU MUST WRITE YOUR STUDENT ID IN THE VARIABLE STUDENT_ID
 # EXAMPLE: STUDENT_ID = "12345678"
 #####################
-STUDENT_ID = "20244096"
+print("STUDENT_ID =" 20244096)
 
 def load_data(file_path):
     inputs=[]
@@ -114,23 +114,21 @@ def making_df(test_labels):
     })
     return dataframe
     
+#train data loading
+file_path_train='./dataset/simple_seq.train.csv'
+train_inputs, train_outputs=load_data(file_path_train)
+    
+train_input_dict=unique_dictionary(train_inputs)
 
+train_output_dict=unique_dictionary(train_outputs)
+    
+onehot_train_input=one_hot_encoding(train_inputs, train_input_dict)
+onehot_vector_train_input=vectorize(onehot_train_input)
+train_labels=categorize_output(train_outputs, train_output_dict)
+X_train, X_test, y_train, y_test=train_test_split(onehot_vector_train_input, train_labels, test_size=0.2, random_state=42)
+  
 
 def main():
-    
-    #train data loading
-    file_path_train='./dataset/simple_seq.train.csv'
-    train_inputs, train_outputs=load_data(file_path_train)
-    
-    train_input_dict=unique_dictionary(train_inputs)
-
-    train_output_dict=unique_dictionary(train_outputs)
-    
-    onehot_train_input=one_hot_encoding(train_inputs, train_input_dict)
-    onehot_vector_train_input=vectorize(onehot_train_input)
-    train_labels=categorize_output(train_outputs, train_output_dict)
-    X_train, X_test, y_train, y_test=train_test_split(onehot_vector_train_input, train_labels, test_size=0.2, random_state=42)
-    #training the model
 
     model=NeuralNet().double().to(device)
     loss_fun=nn.CrossEntropyLoss()
