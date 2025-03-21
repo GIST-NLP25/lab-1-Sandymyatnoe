@@ -6,7 +6,12 @@ from sklearn.model_selection import train_test_split
 import torch.nn as nn
 import torch.optim as optim
 import torch.nn.init as init
-
+if torch.cuda.is_available():
+    dev="cuda:0"
+else:
+    dev='cpu'
+    
+device=torch.device(dev)
 #####################
 # YOU MUST WRITE YOUR STUDENT ID IN THE VARIABLE STUDENT_ID
 # EXAMPLE: STUDENT_ID = "12345678"
@@ -65,7 +70,7 @@ def one_hot_encoding(data_list, data_dict):
 
 
 def vectorize(onehot_data):
-    tensor=torch.from_numpy(onehot_data)
+    tensor=torch.from_numpy(onehot_data).to(device)
     vectorize=tensor.view(tensor.size(0),-1)
     return vectorize
 
@@ -78,9 +83,18 @@ def categorize_output(data_list, data_dict):
         for j in i:
             output_list.append(j)
     output_cat=[train_output_dict[i] for i in output_list]
-    output_tensor=torch.tensor(output_cat)
+    output_tensor=torch.tensor(output_cat).to(device)
     output_tensor=output_tensor.to(torch.long)
     return output_tensor
+
+class linear_layer(nn.Module):
+    def __init__(self, input_dim, output_dim):
+        super(linear_layer, self).__init__()
+        self.weights=nn.Parameter(torch.randn(input_dim, output_dim))
+        nn.init.kaiming_normal_(self.weights, mode='fan_in', nonlinearity='relu')
+        self.bias=nn.Parameter(torch.zeros(output_dim))
+    def forward(self,X):
+        return torch.matmul(X, self.weights)+self.bias
 
 
 #building 3 layers neural network
@@ -89,25 +103,17 @@ class NeuralNet(nn.Module):
     def __init__(self):
         super(NeuralNet, self).__init__()
         
-        self.layer1=nn.Linear(50920, 1000)
-        self.layer2=nn.Linear(1000,100)
-        self.layer3=nn.Linear(100, labels)
-        
-        self.batch_norm1=nn.BatchNorm1d(1000)
-        self.batch_norm2=nn.BatchNorm1d(100)
-        
-        init.kaiming_uniform_(self.layer1.weight, a=0, mode='fan_in', nonlinearity='relu')#same with He init in pytorch
-        init.kaiming_uniform_(self.layer2.weight, a=0, mode='fan_in', nonlinearity='relu')
-        init.kaiming_uniform_(self.layer3.weight, a=0, mode='fan_in', nonlinearity='relu')
-        
-        init.zeros_(self.layer1.bias)
-        init.zeros_(self.layer2.bias)
-        init.zeros_(self.layer3.bias)
+        self.layer1=linear_layer(50920, 1000)
+        self.layer2=linear_layer(1000,100)
+        self.layer3=linear_layer(100, labels)
+        self.Bnorm1=nn.BatchNorm1d(1000, eps=1e-05, momentum=0.1)
+        self.Bnorm2=nn.BatchNorm1d(100, eps=1e-05, momentum=0.1)
         
     def forward(self,X):
-        X=torch.relu(self.batch_norm1(self.layer1(X)))
-        X=torch.relu(self.batch_norm2(self.layer2(X)))
+        X=torch.relu(self.Bnorm1(self.layer1(X)))
+        X=torch.relu(self.Bnorm2(self.layer2(X)))
         X=self.layer3(X)
+        
         return X
 
 
@@ -129,21 +135,24 @@ def main():
     #train data loading
     file_path_train='./dataset/simple_seq.train.csv'
     train_inputs, train_outputs=load_data(file_path_train)
+    
     check_max_len=max_length(train_inputs)
     train_input_dict=unique_dictionary(train_inputs)
 
     train_output_dict=unique_dictionary(train_outputs)
+    
     onehot_train_input=one_hot_encoding(train_inputs, train_input_dict)
     onehot_vector_train_input=vectorize(onehot_train_input)
     train_labels=categorize_output(train_outputs, train_output_dict)
     X_train, X_test, y_train, y_test=train_test_split(onehot_vector_train_input, train_labels, test_size=0.2, random_state=42)
     #training the model
 
-    model=NeuralNet().double()
+    model=NeuralNet().double().to(device)
     loss_fun=nn.CrossEntropyLoss()
-    optimizer=optim.SGD(model.parameters(), lr=0.1, momentum=0.9)
+    optimizer = optim.Adam(model.parameters(), lr=0.001, weight_decay=0.01)
 
-    num_epochs=200
+
+    num_epochs=3000
     for epoch in range(num_epochs):
         model.train()
         outputs=model(X_train).double()
@@ -153,7 +162,7 @@ def main():
         loss.backward()
         optimizer.step()
     
-        if (epoch+1)%10==0:
+        if (epoch+1)%50==0:
             print(f'Epoch [{epoch+1}/{num_epochs}], Loss: {loss.item():.4f}')
     
 
