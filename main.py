@@ -136,7 +136,7 @@ def main():
     file_path_train='./dataset/simple_seq.train.csv'
     train_inputs, train_outputs=load_data(file_path_train)
     
-    check_max_len=max_length(train_inputs)
+    #check_max_len=max_length(train_inputs)
     train_input_dict=unique_dictionary(train_inputs)
 
     train_output_dict=unique_dictionary(train_outputs)
