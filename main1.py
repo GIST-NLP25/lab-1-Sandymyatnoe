@@ -103,25 +103,25 @@ def making_df(test_labels):
         'Pred': pred_test_labels
     })
     return dataframe
-
-def main():
-    # Load train data
-    file_path_train = './dataset/simple_seq.train.csv'
-    train_inputs, train_outputs = load_data(file_path_train)
+# Load train data
+file_path_train = './dataset/simple_seq.train.csv'
+train_inputs, train_outputs = load_data(file_path_train)
     
     # Create dictionaries for train inputs and outputs
-    train_input_dict = unique_dictionary(train_inputs)
-    train_output_dict = unique_dictionary(train_outputs)
+train_input_dict = unique_dictionary(train_inputs)
+train_output_dict = unique_dictionary(train_outputs)
     
     # One hot encode inputs
-    onehot_train_input = one_hot_encoding(train_inputs, train_input_dict)
-    onehot_vector_train_input = vectorize(onehot_train_input)
+onehot_train_input = one_hot_encoding(train_inputs, train_input_dict)
+onehot_vector_train_input = vectorize(onehot_train_input)
     
     # Categorize outputs
-    train_labels = categorize_output(train_outputs, train_output_dict)
+train_labels = categorize_output(train_outputs, train_output_dict)
     
     # Split the data into train and test sets
-    X_train, X_test, y_train, y_test = train_test_split(onehot_vector_train_input, train_labels, test_size=0.2, random_state=42)
+X_train, X_test, y_train, y_test = train_test_split(onehot_vector_train_input, train_labels, test_size=0.2, random_state=42)
+def main():
+    
 
     # Initialize model, loss function, and optimizer
     model = NeuralNet().to(device).float()  # Use float32 for the model
@@ -129,7 +129,7 @@ def main():
     optimizer = optim.Adam(model.parameters(), lr=0.001, weight_decay=0.01)
 
     # Train the model
-    num_epochs = 3000
+    num_epochs = 100
     for epoch in range(num_epochs):
         model.train()
         outputs = model(X_train).float()  # Ensure it is float32
