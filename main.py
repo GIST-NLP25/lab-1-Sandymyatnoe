@@ -55,9 +55,9 @@ def unique_dictionary(data_list):
 
 
 def one_hot_encoding(data_list, data_dict):
-    one_hot=np.zeros((len(data_list), len(data_dict), max_length))
+    one_hot=np.zeros((len(data_list), len(data_dict),20))
     for i,sample in enumerate(data_list):
-        for j,word in list(enumerate(sample))[:max_length]:
+        for j,word in list(enumerate(sample))[:20]:
             index=data_dict.get(word)
             one_hot[i, index, j]=1
     return one_hot
@@ -100,7 +100,7 @@ class NeuralNet(nn.Module):
         
         self.layer1=linear_layer(50920, 1000)
         self.layer2=linear_layer(1000,100)
-        self.layer3=linear_layer(100, labels)
+        self.layer3=linear_layer(100, 19)
         self.Bnorm1=nn.BatchNorm1d(1000, eps=1e-05, momentum=0.1)
         self.Bnorm2=nn.BatchNorm1d(100, eps=1e-05, momentum=0.1)
         
@@ -127,9 +127,7 @@ def making_df(test_labels):
 
 
 def main():
-    max_length=20
-    labels=19
-
+    
     #train data loading
     file_path_train='./dataset/simple_seq.train.csv'
     train_inputs, train_outputs=load_data(file_path_train)
