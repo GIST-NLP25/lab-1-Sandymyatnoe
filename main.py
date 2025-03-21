@@ -16,7 +16,7 @@ device=torch.device(dev)
 # YOU MUST WRITE YOUR STUDENT ID IN THE VARIABLE STUDENT_ID
 # EXAMPLE: STUDENT_ID = "12345678"
 #####################
-print("STUDENT_ID =" 20244096)
+print("STUDENT_ID =", 20244096)
 
 def load_data(file_path):
     inputs=[]
