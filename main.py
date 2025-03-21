@@ -34,16 +34,6 @@ def load_data(file_path):
 
 
 
-#checking max length of sentence
-
-def max_length(list_sentences):
-    lengths=[]
-    for i in list_sentences:
-        lengths.append(len(i))
-    max_len=max(lengths) 
-    return max_len
-
-
 def unique_dictionary(data_list):
     word_list=[]
     for i in data_list:
