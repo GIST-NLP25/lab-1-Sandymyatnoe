@@ -54,11 +54,6 @@ def unique_dictionary(data_list):
     return dictionary
 
 
-
-max_length=20
-labels=19
-
-
 def one_hot_encoding(data_list, data_dict):
     one_hot=np.zeros((len(data_list), len(data_dict), max_length))
     for i,sample in enumerate(data_list):
@@ -132,6 +127,9 @@ def making_df(test_labels):
 
 
 def main():
+    max_length=20
+    labels=19
+
     #train data loading
     file_path_train='./dataset/simple_seq.train.csv'
     train_inputs, train_outputs=load_data(file_path_train)
