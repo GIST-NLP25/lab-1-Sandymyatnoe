@@ -34,8 +34,7 @@ class LinearLayer(nn.Module):
         self.weight = nn.Parameter(torch.FloatTensor(in_features, out_features).uniform_(-limit, limit))
         self.bias = nn.Parameter(torch.zeros(out_features))
     
-    def forward(self, x):
-        
+    def forward(self, x):        
         return torch.matmul(x, self.weight) + self.bias
 
 class NeuralNet_p1(nn.Module):
@@ -44,8 +43,7 @@ class NeuralNet_p1(nn.Module):
         
         self.linear1 = LinearLayer(vocab_size*max_length, 2048)  
         self.linear2 = LinearLayer(2048, 512)  
-        self.linear3 = LinearLayer(512, num_classes)
-        
+        self.linear3 = LinearLayer(512, num_classes)  
         self.bn1 = nn.BatchNorm1d(2048)
         self.bn2 = nn.BatchNorm1d(512)
         self.dropout = nn.Dropout(0.3)  
@@ -63,13 +61,10 @@ class NeuralNet_p2(nn.Module):
     def __init__(self, vocab_size, embed_dim, num_classes):
         super(NeuralNet_p2, self).__init__()
         self.embedding = WordEmbedding(vocab_size, embed_dim)
-        self.input_dim = embed_dim * 20
-        
-     
+        self.input_dim = embed_dim * 20      
         self.linear1 = LinearLayer(self.input_dim, 2048) 
         self.linear2 = LinearLayer(2048, 512) 
-        self.linear3 = LinearLayer(512, num_classes)
-        
+        self.linear3 = LinearLayer(512, num_classes)  
         self.bn1 = nn.BatchNorm1d(2048)
         self.bn2 = nn.BatchNorm1d(512)
         self.dropout = nn.Dropout(0.3)
@@ -193,7 +188,6 @@ def main():
     train_model(model1, X_train, y_train,X_test,y_test)
 
     onehot_test_input=one_hot_encoding(test_inputs, input_dict)
-
     onehot_vector_test_input=vectorize(onehot_test_input).to(device)
     
     model1.eval()
@@ -218,17 +212,12 @@ def main():
 
     X_test_unseen=unseen_padding(test_inputs).to(device)
 
-    
-
-
     model2.eval()
     with torch.no_grad():
         test_labels=model2(X_test_unseen)
         val, pred_test_labels=torch.max(test_labels,1)
 
     final_df2=making_df(pred_test_labels)
-
-
     final_df2.to_csv('20244096_simple_seq.p2.answer.csv', index=False)
 
     
